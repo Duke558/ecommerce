@@ -40,7 +40,7 @@ const ProductDetails = () => {
       setLoading(true);
       setError(false);
       try {
-        const res = await axios.get(`http://localhost:5000/api/products/${id}`);
+        const res = await axios.get(`https://ecommerce-ams5.onrender.com/api/products/${id}`);
         setProduct(res.data);
         fetchRelatedProducts(res.data.category);
       } catch (err) {
