@@ -21,7 +21,7 @@ const Orders = () => {
 
         setOrders(response.data);
       } catch (error) {
-        console.error('❌ Failed to fetch orders:', error);
+        console.error(' Failed to fetch orders:', error);
       }
     };
 
@@ -33,7 +33,7 @@ const Orders = () => {
   return (
     <div className="max-w-5xl mx-auto px-4 sm:px-6 lg:px-8 py-8">
       <h2 className="text-2xl sm:text-3xl font-bold mb-6 text-center text-orange-600">
-        🛍 My Orders
+         My Orders
       </h2>
 
       {orders.length === 0 ? (
