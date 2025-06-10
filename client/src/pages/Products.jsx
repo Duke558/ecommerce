@@ -71,14 +71,14 @@ const Products = () => {
   };
 
   return (
-    <div className="p-6 max-w-7xl mx-auto bg-white min-h-screen">
+    <div className="p-4 sm:p-6 max-w-7xl mx-auto bg-white min-h-screen">
       {/* Category Filter */}
-      <div className="mb-6 flex flex-wrap gap-2 justify-center">
+      <div className="mb-6 flex flex-wrap gap-3 justify-center">
         {categories.map((cat) => (
           <button
             key={cat._id}
             onClick={() => handleCategoryClick(cat._id)}
-            className={`px-4 py-2 rounded-full text-sm font-medium border transition-all duration-200
+            className={`px-4 py-2 rounded-full text-sm font-medium border transition-all duration-200 
               ${category === cat._id
                 ? 'bg-orange-500 text-white border-orange-600'
                 : 'bg-white text-gray-800 border-gray-300 hover:bg-orange-100 hover:text-orange-600'
@@ -96,7 +96,7 @@ const Products = () => {
           value={search}
           onChange={handleSearchChange}
           placeholder="🔍 Search for products..."
-          className="w-full sm:w-1/2 px-4 py-3 rounded-full border border-orange-300 shadow-md focus:ring-2 focus:ring-orange-400 transition"
+          className="w-full sm:w-1/2 px-4 py-3 rounded-full border border-orange-300 shadow focus:ring-2 focus:ring-orange-400 transition"
         />
         {(category || search) && (
           <button
@@ -117,19 +117,19 @@ const Products = () => {
             products.map((product) => (
               <div
                 key={product._id}
-                className="bg-white rounded-xl overflow-hidden shadow-sm hover:shadow-md transition duration-300 border border-orange-200"
+                className="bg-white rounded-xl overflow-hidden shadow hover:shadow-md transition duration-300 border border-orange-200"
               >
                 <img
                   src={product.image}
                   alt={product.name}
                   className="h-40 w-full object-cover"
                 />
-                <div className="p-3">
+                <div className="p-3 flex flex-col gap-1">
                   <h2 className="text-sm font-medium text-gray-800 truncate">{product.name}</h2>
-                  <p className="text-red-500 font-bold mt-1 text-lg">₱{product.price}</p>
+                  <p className="text-red-500 font-bold text-base">₱{product.price.toFixed(2)}</p>
                   <Link
                     to={`/products/${product._id}`}
-                    className="mt-2 inline-block text-center w-full px-3 py-1.5 text-sm bg-orange-500 text-white rounded-full hover:bg-orange-600 transition"
+                    className="mt-2 text-center w-full px-3 py-1.5 text-sm bg-orange-500 text-white rounded-full hover:bg-orange-600 transition"
                   >
                     View Details
                   </Link>
@@ -137,7 +137,9 @@ const Products = () => {
               </div>
             ))
           ) : (
-            <p className="text-center text-gray-600 col-span-full font-medium">🚫 No products found.</p>
+            <p className="text-center text-gray-600 col-span-full font-medium">
+              🚫 No products found.
+            </p>
           )}
         </div>
       )}

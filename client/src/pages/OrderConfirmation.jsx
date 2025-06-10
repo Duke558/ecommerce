@@ -4,75 +4,70 @@ import { useParams, Link } from 'react-router-dom';
 import axios from 'axios';
 
 const OrderConfirmation = () => {
-  const { orderId } = useParams(); // Get orderId from URL
-  const [order, setOrder] = useState(null); // State to hold order data
-  const [loading, setLoading] = useState(true); // Loading state
-  const [error, setError] = useState(''); // Error state
+  const { orderId } = useParams();
+  const [order, setOrder] = useState(null);
+  const [loading, setLoading] = useState(true);
+  const [error, setError] = useState('');
 
   useEffect(() => {
-    // Function to fetch order details
     const fetchOrder = async () => {
       try {
         const response = await axios.get(`http://localhost:5000/api/orders/${orderId}`);
-        setOrder(response.data); // Set order details in state
-        setLoading(false); // Set loading to false once data is fetched
+        setOrder(response.data);
+        setLoading(false);
       } catch (err) {
         console.error(err);
-        setError('Failed to fetch order details'); // Set error message if failed
-        setLoading(false); // Set loading to false
+        setError('Failed to fetch order details');
+        setLoading(false);
       }
     };
 
-    fetchOrder(); // Call the fetch order function
-  }, [orderId]); // Dependency array ensures this runs when orderId changes
+    fetchOrder();
+  }, [orderId]);
 
   if (loading) return <div className="p-6 text-center">Loading order details...</div>;
   if (error) return <div className="p-6 text-center text-red-600">{error}</div>;
 
   return (
-    <div className="max-w-2xl mx-auto p-6">
-      <h2 className="text-3xl font-bold mb-4 text-green-700">✅ Order Placed Successfully!</h2>
-      <p className="mb-4">Your order ID is <span className="font-mono font-semibold">{order._id}</span>.</p>
+    <div className="max-w-3xl mx-auto p-4 sm:p-6">
+      <h2 className="text-2xl sm:text-3xl font-bold mb-4 text-green-700">✅ Order Placed Successfully!</h2>
+      <p className="mb-4 text-sm sm:text-base">Your order ID is <span className="font-mono font-semibold break-all">{order._id}</span>.</p>
 
-      <div className="bg-gray-100 p-4 rounded-lg shadow-sm">
-        <h3 className="text-xl font-semibold mb-2">Order Summary</h3>
-        <ul className="mb-2">
-          {/* Safely mapping through order items to display each item and its quantity */}
+      <div className="bg-gray-100 p-4 sm:p-6 rounded-lg shadow-sm">
+        <h3 className="text-lg sm:text-xl font-semibold mb-2">Order Summary</h3>
+        <ul className="mb-2 text-sm sm:text-base space-y-1">
           {order.items && order.items.length > 0 ? (
             order.items.map((item, index) => (
-              <li key={index}>
-                {item.name} x {item.quantity} = ₱{(item.price * item.quantity).toFixed(2)}
+              <li key={index} className="flex justify-between">
+                <span>{item.name} x {item.quantity}</span>
+                <span>₱{(item.price * item.quantity).toFixed(2)}</span>
               </li>
             ))
           ) : (
             <p>No items in this order.</p>
           )}
         </ul>
-        {/* Display total amount */}
-        <p>Total Amount: <strong>₱{order.totalAmount.toFixed(2)}</strong></p>
-        {/* Display delivery method */}
+        <p className="font-semibold mt-2">Total Amount: <span className="text-black">₱{order.totalAmount.toFixed(2)}</span></p>
         <p>Delivery Method: {order.deliveryMethod}</p>
-        {/* Display payment method */}
         <p>Payment Method: {order.paymentMethod}</p>
-        {/* Display order status */}
         <p>Status: {order.status}</p>
       </div>
 
-      {/* Track Order button */}
-      <Link
-        to={`/track-order/${order._id}`}
-        className="inline-block mt-4 bg-indigo-600 text-white px-4 py-2 rounded hover:bg-indigo-700 transition"
-      >
-        Track Your Order
-      </Link>
+      <div className="mt-6 flex flex-col sm:flex-row sm:items-center sm:gap-4">
+        <Link
+          to={`/track-order/${order._id}`}
+          className="bg-indigo-600 text-white px-4 py-2 rounded hover:bg-indigo-700 transition text-center mb-3 sm:mb-0"
+        >
+          Track Your Order
+        </Link>
 
-      {/* Link back to home page */}
-      <Link
-        to="/"
-        className="inline-block mt-4 ml-4 bg-blue-600 text-white px-4 py-2 rounded hover:bg-blue-700 transition"
-      >
-        Back to Home
-      </Link>
+        <Link
+          to="/"
+          className="bg-blue-600 text-white px-4 py-2 rounded hover:bg-blue-700 transition text-center"
+        >
+          Back to Home
+        </Link>
+      </div>
     </div>
   );
 };

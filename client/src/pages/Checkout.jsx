@@ -14,8 +14,6 @@ const Checkout = () => {
   const [paymentMethod, setPaymentMethod] = useState('cod');
   const [isSubmitting, setIsSubmitting] = useState(false);
   const [isApplyingDiscount, setIsApplyingDiscount] = useState(false);
-
-  // Shipping address state
   const [shippingAddress, setShippingAddress] = useState({
     fullName: '',
     addressLine1: '',
@@ -25,12 +23,8 @@ const Checkout = () => {
     postalCode: '',
     phoneNumber: '',
   });
-
-  // GCash
   const [gcashNumber, setGcashNumber] = useState('');
   const [gcashPin, setGcashPin] = useState('');
-
-  // Credit Card
   const [cardNumber, setCardNumber] = useState('');
   const [expiryDate, setExpiryDate] = useState('');
   const [cvv, setCvv] = useState('');
@@ -59,14 +53,13 @@ const Checkout = () => {
         promoCode: discountCode.trim(),
         totalAmount: subtotal,
       });
-
       const { newTotal, discountApplied } = data;
       const discountVal = Math.max(0, subtotal - newTotal);
       setDiscountAmount(discountVal);
       toast.success(`🎉 ${discountApplied}% discount applied!`);
       setDiscountCode('');
     } catch (err) {
-      console.error('Promo apply error:', err.response?.data || err.message || err);
+      console.error('Promo apply error:', err);
       setDiscountAmount(0);
       toast.error('Invalid or expired discount code');
     } finally {
@@ -79,67 +72,43 @@ const Checkout = () => {
       toast.error('Please login to place an order');
       return;
     }
-
     if (cartItems.length === 0) {
       toast.error('Your cart is empty!');
       return;
     }
-
-    // Validate shipping address if delivery is selected
     if (deliveryMethod === 'delivery') {
       const { fullName, addressLine1, city, province, postalCode, phoneNumber } = shippingAddress;
-      if (
-        !fullName.trim() ||
-        !addressLine1.trim() ||
-        !city.trim() ||
-        !province.trim() ||
-        !postalCode.trim() ||
-        !phoneNumber.trim()
-      ) {
+      if (!fullName || !addressLine1 || !city || !province || !postalCode || !phoneNumber) {
         toast.error('Please complete all required shipping address fields.');
         return;
       }
     }
-
     if (paymentMethod === 'gcash' && (!gcashNumber.trim() || !gcashPin.trim())) {
       toast.error('Please enter your GCash number and PIN');
       return;
     }
-
     if (
       paymentMethod === 'credit_card' &&
       (!cardNumber.trim() || !expiryDate.trim() || !cvv.trim() || !cardholderName.trim())
     ) {
-      toast.error(' Complete all credit card fields');
+      toast.error('Complete all credit card fields');
       return;
     }
 
     const userEmail =
-      (user.primaryEmailAddress && user.primaryEmailAddress.emailAddress) ||
-      (user.emailAddresses && user.emailAddresses[0]?.emailAddress) ||
-      user.emailAddresses ||
+      user.primaryEmailAddress?.emailAddress ||
+      user.emailAddresses?.[0]?.emailAddress ||
       '';
 
-    // Construct a valid order.items array with type safety and filtering
-    const items = cartItems
-      .map((item) => ({
-        productId: String(item.productId || item._id || item.id || ''),
-        name: String(item.name || ''),
-        quantity: Number(item.quantity),
-        price: Number(item.price),
-      }))
-      .filter(
-        (item) =>
-          item.productId &&
-          item.name &&
-          !isNaN(item.quantity) &&
-          item.quantity > 0 &&
-          !isNaN(item.price) &&
-          item.price >= 0
-      );
+    const items = cartItems.map(item => ({
+      productId: String(item.productId || item._id || item.id || ''),
+      name: String(item.name || ''),
+      quantity: Number(item.quantity),
+      price: Number(item.price),
+    })).filter(item => item.productId && item.name && item.quantity > 0 && item.price >= 0);
 
     if (items.length === 0) {
-      toast.error(' Invalid items in cart.');
+      toast.error('Invalid items in cart.');
       return;
     }
 
@@ -154,51 +123,15 @@ const Checkout = () => {
       status: 'Processing',
     };
 
-    if (deliveryMethod === 'delivery') {
-      order.shippingAddress = {
-        fullName: shippingAddress.fullName.trim(),
-        addressLine1: shippingAddress.addressLine1.trim(),
-        addressLine2: shippingAddress.addressLine2.trim(),
-        city: shippingAddress.city.trim(),
-        province: shippingAddress.province.trim(),
-        postalCode: shippingAddress.postalCode.trim(),
-        phoneNumber: shippingAddress.phoneNumber.trim(),
-      };
-    }
-
-    if (paymentMethod === 'gcash') {
-      order.gcash = {
-        number: gcashNumber.trim(),
-        pin: gcashPin.trim(),
-      };
-    }
-
-    if (paymentMethod === 'credit_card') {
-      order.creditCard = {
-        number: cardNumber.trim(),
-        expiry: expiryDate.trim(),
-        cvv: cvv.trim(),
-        name: cardholderName.trim(),
-      };
-    }
+    if (deliveryMethod === 'delivery') order.shippingAddress = shippingAddress;
+    if (paymentMethod === 'gcash') order.gcash = { number: gcashNumber, pin: gcashPin };
+    if (paymentMethod === 'credit_card') order.creditCard = { number: cardNumber, expiry: expiryDate, cvv, name: cardholderName };
 
     try {
       setIsSubmitting(true);
-
-      // Debugging logs
-      console.log('cartItems:', cartItems);
-      console.log('constructed order.items:', order.items);
-
       const response = await axios.post('http://localhost:5000/api/orders', order);
-
       if (response.status === 201) {
         const { orderId } = response.data;
-
-        if (!orderId) {
-          toast.error('Order ID not returned!');
-          return;
-        }
-
         clearCart();
         toast.success('Order placed successfully!');
         navigate(`/order-confirmation/${orderId}`);
@@ -206,18 +139,8 @@ const Checkout = () => {
         toast.error('Failed to place order.');
       }
     } catch (err) {
-      let errorMessage = 'Something went wrong';
-      if (err.response && err.response.data) {
-        if (typeof err.response.data === 'string') {
-          errorMessage = err.response.data;
-        } else if (err.response.data.message) {
-          errorMessage = err.response.data.message;
-        }
-      } else if (err.message) {
-        errorMessage = err.message;
-      }
-      console.error('Order submission failed:', errorMessage);
-      toast.error(errorMessage);
+      console.error('Order submission failed:', err);
+      toast.error(err.response?.data?.message || err.message || 'Something went wrong');
     } finally {
       setIsSubmitting(false);
     }
@@ -225,8 +148,7 @@ const Checkout = () => {
 
   return (
     <div className="max-w-2xl mx-auto p-6 bg-white shadow-lg rounded-md border border-gray-200">
-      <h2 className="text-3xl font-semibold mb-6 text-gray-800"> Checkout</h2>
-
+      <h2 className="text-3xl font-semibold mb-6 text-gray-800">Checkout</h2>
       {cartItems.length === 0 ? (
         <p className="text-gray-600 text-lg text-center">Your cart is empty. Please add items to proceed.</p>
       ) : (
@@ -239,7 +161,7 @@ const Checkout = () => {
         ))
       )}
 
-      {/* Discount Code */}
+      {/* Discount */}
       <div className="mt-6">
         <label className="block font-medium text-gray-700 mb-2">Discount Code</label>
         <div className="flex">
@@ -277,77 +199,31 @@ const Checkout = () => {
         </select>
       </div>
 
-      {/* Shipping Address - show only if delivery */}
+      {/* Shipping Address */}
       {deliveryMethod === 'delivery' && (
         <div className="border p-4 rounded mb-4 bg-gray-50">
           <h3 className="text-lg font-medium mb-3">Shipping Address</h3>
-
-          <input
-            type="text"
-            placeholder="Full Name"
-            className="border p-2 rounded w-full mb-2"
-            value={shippingAddress.fullName}
-            onChange={(e) => setShippingAddress({ ...shippingAddress, fullName: e.target.value })}
-            disabled={isSubmitting}
-          />
-          <input
-            type="text"
-            placeholder="Address Line 1"
-            className="border p-2 rounded w-full mb-2"
-            value={shippingAddress.addressLine1}
-            onChange={(e) => setShippingAddress({ ...shippingAddress, addressLine1: e.target.value })}
-            disabled={isSubmitting}
-          />
-          <input
-            type="text"
-            placeholder="Address Line 2 (Optional)"
-            className="border p-2 rounded w-full mb-2"
-            value={shippingAddress.addressLine2}
-            onChange={(e) => setShippingAddress({ ...shippingAddress, addressLine2: e.target.value })}
-            disabled={isSubmitting}
-          />
-          <input
-            type="text"
-            placeholder="City"
-            className="border p-2 rounded w-full mb-2"
-            value={shippingAddress.city}
-            onChange={(e) => setShippingAddress({ ...shippingAddress, city: e.target.value })}
-            disabled={isSubmitting}
-          />
-          <input
-            type="text"
-            placeholder="Province"
-            className="border p-2 rounded w-full mb-2"
-            value={shippingAddress.province}
-            onChange={(e) => setShippingAddress({ ...shippingAddress, province: e.target.value })}
-            disabled={isSubmitting}
-          />
-          <input
-            type="text"
-            placeholder="Postal Code"
-            className="border p-2 rounded w-full mb-2"
-            value={shippingAddress.postalCode}
-            onChange={(e) => setShippingAddress({ ...shippingAddress, postalCode: e.target.value })}
-            disabled={isSubmitting}
-          />
-          <input
-            type="text"
-            placeholder="Phone Number"
-            className="border p-2 rounded w-full"
-            value={shippingAddress.phoneNumber}
-            onChange={(e) => setShippingAddress({ ...shippingAddress, phoneNumber: e.target.value })}
-            disabled={isSubmitting}
-          />
+          {Object.entries(shippingAddress).map(([key, value]) => (
+            <input
+              key={key}
+              type="text"
+              placeholder={key.replace(/([A-Z])/g, ' $1')}
+              className="border p-2 rounded w-full mb-2"
+              value={value}
+              onChange={(e) => setShippingAddress({ ...shippingAddress, [key]: e.target.value })}
+              disabled={isSubmitting}
+            />
+          ))}
         </div>
       )}
 
       {/* Payment Method */}
-      <div className="border p-4 rounded mb-4 bg-gray-50">
-        <label className="text-lg font-medium mb-3">Payment Method</label>
-        <select cl
+      <div className="mt-6">
+        <label className="block font-medium text-gray-700">Payment Method</label>
+        <select
           value={paymentMethod}
           onChange={(e) => setPaymentMethod(e.target.value)}
-          className="border p-2 rounded w-full"
+          className="border p-2 rounded w-full focus:ring-2 focus:ring-blue-500"
           disabled={isSubmitting}
         >
           <option value="cod">Cash on Delivery</option>
@@ -356,9 +232,9 @@ const Checkout = () => {
         </select>
       </div>
 
-      {/* GCash fields */}
+      {/* GCash Fields */}
       {paymentMethod === 'gcash' && (
-        <div className="mt-4">
+        <div className="border p-4 rounded mt-4 bg-gray-50">
           <input
             type="text"
             placeholder="GCash Number"
@@ -378,13 +254,13 @@ const Checkout = () => {
         </div>
       )}
 
-      {/* Credit Card fields */}
+      {/* Credit Card Fields */}
       {paymentMethod === 'credit_card' && (
-        <div className="mt-4 space-y-2">
+        <div className="border p-4 rounded mt-4 bg-gray-50">
           <input
             type="text"
             placeholder="Card Number"
-            className="border p-2 rounded w-full"
+            className="border p-2 rounded w-full mb-2"
             value={cardNumber}
             onChange={(e) => setCardNumber(e.target.value)}
             disabled={isSubmitting}
@@ -392,7 +268,7 @@ const Checkout = () => {
           <input
             type="text"
             placeholder="Expiry Date (MM/YY)"
-            className="border p-2 rounded w-full"
+            className="border p-2 rounded w-full mb-2"
             value={expiryDate}
             onChange={(e) => setExpiryDate(e.target.value)}
             disabled={isSubmitting}
@@ -400,7 +276,7 @@ const Checkout = () => {
           <input
             type="text"
             placeholder="CVV"
-            className="border p-2 rounded w-full"
+            className="border p-2 rounded w-full mb-2"
             value={cvv}
             onChange={(e) => setCvv(e.target.value)}
             disabled={isSubmitting}
@@ -416,18 +292,18 @@ const Checkout = () => {
         </div>
       )}
 
-      {/* Order Summary */}
-      <div className="mt-6 border-t pt-4 text-gray-800">
-        <p className="flex justify-between font-medium">Subtotal: ₱{subtotal.toFixed(2)}</p>
-        <p className="flex justify-between font-medium text-green-600">Discount: -₱{discountAmount.toFixed(2)}</p>
-        <p className="flex justify-between font-medium">Delivery Fee: ₱{deliveryFee.toFixed(2)}</p>
-        <p className="flex justify-between font-bold text-xl mt-2">Total: ₱{totalAmount.toFixed(2)}</p>
+      {/* Summary & Button */}
+      <div className="mt-6 text-gray-800">
+        <p>Subtotal: ₱{subtotal.toFixed(2)}</p>
+        <p>Discount: -₱{discountAmount.toFixed(2)}</p>
+        <p>Delivery Fee: ₱{deliveryFee.toFixed(2)}</p>
+        <p className="font-bold text-xl mt-2">Total: ₱{totalAmount.toFixed(2)}</p>
       </div>
 
       <button
         onClick={handleOrderSubmit}
-        disabled={isSubmitting}
-        className={`mt-6 w-full py-3 rounded text-white text-lg font-semibold ${
+        disabled={isSubmitting || cartItems.length === 0}
+        className={`mt-6 w-full py-3 rounded-md text-white font-semibold transition ${
           isSubmitting ? 'bg-gray-400 cursor-not-allowed' : 'bg-green-600 hover:bg-green-700'
         }`}
       >

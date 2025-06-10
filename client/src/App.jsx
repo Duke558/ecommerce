@@ -9,9 +9,15 @@ import PrivateRoute from "./routes/PrivateRoute";
 import OrderConfirmation from "./pages/OrderConfirmation";
 import Orders from "./pages/Orders";
 import TrackOrder from "./pages/TrackOrder";
-import { FaHome, FaBoxOpen, FaShoppingCart, FaUser, FaSearch, FaHeart } from "react-icons/fa";
-
-import { SignedIn, SignedOut, UserButton, SignInButton, SignUpButton, useUser } from "@clerk/clerk-react";
+import { FaHome, FaBoxOpen, FaShoppingCart } from "react-icons/fa";
+import {
+  SignedIn,
+  SignedOut,
+  UserButton,
+  SignInButton,
+  SignUpButton,
+  useUser,
+} from "@clerk/clerk-react";
 import { ToastContainer } from "react-toastify";
 import "react-toastify/dist/ReactToastify.css";
 
@@ -28,7 +34,7 @@ const App = () => {
   }, []);
 
   return (
-    <div className="bg-gray-100 min-h-screen">
+    <div className="bg-white min-h-screen font-sans">
       {/* 🔹 Toast Notifications */}
       <ToastContainer
         position="top-right"
@@ -43,42 +49,43 @@ const App = () => {
       />
 
       {/* 🔹 Navbar */}
-      <header className="bg-white shadow-md p-3">
-        <div className="max-w-6xl mx-auto px-4 py-4 flex justify-between items-center">
-          <h1 className="text-xl font-bold text-blue-600">🛍 SnapCartel</h1>
+      <header className="bg-white shadow fixed top-0 left-0 w-full z-50">
+        <div className="max-w-6xl mx-auto px-4 py-3 flex flex-wrap items-center justify-between">
+          <h1 className="text-xl sm:text-2xl font-bold text-orange-500">🛒 SnapCartel</h1>
 
-          <nav className="flex gap-6 text-gray-600 font-medium">
-            <Link to="/" className="hover:text-blue-600 flex items-center gap-2">
-              <FaHome /> Home
+          {/* 🔹 Main Navigation */}
+          <nav className="flex flex-wrap justify-center sm:justify-start gap-4 text-gray-600 font-medium text-sm">
+            <Link to="/" className="hover:text-orange-500 flex items-center gap-1">
+              <FaHome /> <span className="hidden sm:inline">Home</span>
             </Link>
-            <Link to="/products" className="hover:text-blue-600 flex items-center gap-2">
-              <FaBoxOpen /> Products
+            <Link to="/products" className="hover:text-orange-500 flex items-center gap-1">
+              <FaBoxOpen /> <span className="hidden sm:inline">Products</span>
             </Link>
-            <Link to="/cart" className="relative hover:text-blue-600 flex items-center gap-2">
+            <Link to="/cart" className="hover:text-orange-500 flex items-center gap-1 relative">
               <FaShoppingCart />
-              Cart
+              <span className="hidden sm:inline">Cart</span>
               {cartCount > 0 && (
-                <span className="ml-1 bg-blue-500 text-white text-xs font-semibold px-2 py-0.5 rounded-full">
+                <span className="absolute -top-2 -right-3 bg-red-500 text-white text-xs font-bold px-2 py-0.5 rounded-full">
                   {cartCount}
                 </span>
               )}
             </Link>
           </nav>
 
-          {/* 🔹 User Menu */}
-          <div className="flex gap-4 text-gray-600">
+          {/* 🔹 User Auth / Profile */}
+          <div className="flex gap-2 items-center text-gray-600 text-sm">
             <SignedIn>
-              <Link to="/orders" className="hover:text-blue-600 flex items-center gap-2">
+              <Link to="/orders" className="hover:text-orange-500">
                 📦 My Orders
               </Link>
               <UserButton afterSignOutUrl="/" />
             </SignedIn>
             <SignedOut>
               <SignInButton mode="modal">
-                <button className="hover:text-blue-600">Login</button>
+                <button className="hover:text-orange-500">Login</button>
               </SignInButton>
               <SignUpButton mode="modal">
-                <button className="hover:text-blue-600">Register</button>
+                <button className="hover:text-orange-500">Register</button>
               </SignUpButton>
             </SignedOut>
           </div>
@@ -86,7 +93,7 @@ const App = () => {
       </header>
 
       {/* 🔹 Main Content */}
-      <main className="mt-6 px-4 max-w-6xl mx-auto">
+      <main className="pt-20 px-4 sm:px-6 md:px-8 max-w-6xl mx-auto">
         <Routes>
           <Route path="/" element={<Home />} />
           <Route path="/products" element={<Products />} />

@@ -17,10 +17,9 @@ const ProductDetails = () => {
   const [reviews, setReviews] = useState([]);
   const [sortBy, setSortBy] = useState('createdAt');
   const [sortOrder, setSortOrder] = useState('desc');
-  const [showReviews, setShowReviews] = useState(false); // <-- Added here
+  const [showReviews, setShowReviews] = useState(false);
 
   const [token, setToken] = useState(null);
-
   const [newRating, setNewRating] = useState(5);
   const [newComment, setNewComment] = useState('');
 
@@ -30,7 +29,7 @@ const ProductDetails = () => {
         const t = await getToken();
         setToken(t);
       } else {
-        setToken(null); // Clear token if signed out
+        setToken(null);
       }
     };
     fetchToken();
@@ -51,7 +50,6 @@ const ProductDetails = () => {
         setLoading(false);
       }
     };
-
     fetchProduct();
   }, [id]);
 
@@ -98,22 +96,15 @@ const ProductDetails = () => {
     window.dispatchEvent(new Event('storage'));
   };
 
-  const handleSortChange = (event) => {
-    setSortBy(event.target.value);
-  };
-
-  const handleSortOrderChange = () => {
-    setSortOrder((prev) => (prev === 'asc' ? 'desc' : 'asc'));
-  };
+  const handleSortChange = (event) => setSortBy(event.target.value);
+  const handleSortOrderChange = () => setSortOrder((prev) => (prev === 'asc' ? 'desc' : 'asc'));
 
   const handleSubmitReview = async (e) => {
     e.preventDefault();
-
     if (!newRating || !newComment.trim()) {
       toast.error('Please provide both rating and comment.');
       return;
     }
-
     if (!isSignedIn || !token) {
       toast.error('Please log in to submit a review');
       return;
@@ -125,7 +116,6 @@ const ProductDetails = () => {
         { rating: newRating, comment: newComment },
         { headers: { Authorization: `Bearer ${token}` } }
       );
-
       toast.success('Review submitted!');
       setNewRating(5);
       setNewComment('');
@@ -141,66 +131,75 @@ const ProductDetails = () => {
       ? (reviews.reduce((sum, r) => sum + r.rating, 0) / reviews.length).toFixed(1)
       : null;
 
-  if (loading) return <p>Loading product details...</p>;
-  if (error || !product) return <p>Product not found.</p>;
+  if (loading) return <p className="text-center p-10">Loading product details...</p>;
+  if (error || !product) return <p className="text-center p-10 text-red-500">Product not found.</p>;
 
   return (
-    <div className="max-w-3xl mx-auto p-6 bg-white shadow-lg rounded-lg border border-gray-200">
-      {/* Product Image & Info */}
-      <div className="mb-6">
-        <img
-          src={product.image}
-          alt={product.name}
-          className="w-full h-80 object-cover rounded-lg shadow-md"
-        />
+    <div className="max-w-7xl mx-auto px-4 py-8">
+      {/* Product Section */}
+      <div className="grid grid-cols-1 md:grid-cols-2 gap-8">
+        {/* Product Image */}
+        <div>
+          <img
+            src={product.image}
+            alt={product.name}
+            className="w-full h-96 object-cover rounded-lg shadow-md"
+          />
+        </div>
+
+        {/* Product Info */}
+        <div className="flex flex-col justify-between">
+          <div>
+            <h2 className="text-3xl font-bold text-gray-900 mb-2">{product.name}</h2>
+            <p className="text-gray-600 mb-4">{product.description}</p>
+            <p className="text-red-500 text-3xl font-extrabold mb-2">₱{product.price}</p>
+            {averageRating && (
+              <p className="text-yellow-500 font-medium mb-4">⭐ {averageRating} / 5</p>
+            )}
+          </div>
+
+          <button
+            onClick={handleAddToCart}
+            className="w-full md:w-auto px-6 py-3 bg-orange-500 text-white text-lg font-semibold rounded-lg hover:bg-orange-600 transition"
+          >
+            🛒 Add to Cart
+          </button>
+        </div>
       </div>
 
-      <h2 className="text-3xl font-semibold text-gray-800 mb-2">{product.name}</h2>
-      <p className="text-gray-600 mb-4">{product.description}</p>
-      <p className="text-green-500 font-bold text-xl mt-2">₱{product.price}</p>
-      {averageRating && <p className="text-yellow-500 mt-2">⭐ {averageRating} / 5</p>}
-
-      <button
-        onClick={handleAddToCart}
-        className="mt-4 px-6 py-3 bg-blue-600 text-white rounded-lg shadow-md hover:bg-blue-700 transition"
-      >
-        🛒 Add to Cart
-      </button>
-
-      {/* Customer Reviews */}
-      <section className="mb-12">
-        <h2 className="text-2xl font-semibold mb-4">Customer Reviews</h2>
+      {/* Customer Reviews Section */}
+      <section className="mt-12">
+        <h2 className="text-2xl font-bold mb-4">Customer Reviews</h2>
 
         {!showReviews ? (
           <button
             onClick={() => setShowReviews(true)}
-            className="text-blue-600 font-semibold hover:underline focus:outline-none"
+            className="text-blue-600 font-semibold underline"
           >
             See Reviews ({reviews.length})
           </button>
         ) : (
           <>
-            <div className="mb-4 flex items-center gap-3">
-              <label className="text-lg">Sort by:</label>
+            <div className="flex flex-wrap gap-4 items-center mb-4">
               <select
                 value={sortBy}
                 onChange={handleSortChange}
-                className="p-2 rounded border bg-gray-200 text-gray-700 shadow-sm focus:ring-2 focus:ring-blue-500"
+                className="p-2 rounded border bg-white shadow-sm"
               >
-                <option value="createdAt">Date</option>
-                <option value="rating">Rating</option>
+                <option value="createdAt">Sort by Date</option>
+                <option value="rating">Sort by Rating</option>
               </select>
 
               <button
                 onClick={handleSortOrderChange}
-                className="px-4 py-2 bg-gray-600 text-white rounded-lg hover:bg-gray-700 transition"
+                className="px-4 py-2 bg-gray-700 text-white rounded hover:bg-gray-800"
               >
                 {sortOrder === 'asc' ? 'Sort Descending' : 'Sort Ascending'}
               </button>
 
               <button
                 onClick={() => setShowReviews(false)}
-                className="ml-auto px-4 py-2 bg-red-600 text-white rounded-lg hover:bg-red-700 transition"
+                className="ml-auto px-4 py-2 bg-red-600 text-white rounded hover:bg-red-700"
               >
                 Hide Reviews
               </button>
@@ -211,16 +210,16 @@ const ProductDetails = () => {
         )}
       </section>
 
-      {/* Write a Review */}
-      <div className="mt-10">
-        <h3 className="text-xl font-semibold mb-3">Write a Review</h3>
+      {/* Submit Review Section */}
+      <section className="mt-10">
+        <h3 className="text-xl font-bold mb-3">Write a Review</h3>
         <form onSubmit={handleSubmitReview} className="space-y-4">
           <div>
             <label className="block mb-1">Rating</label>
             <select
               value={newRating}
               onChange={(e) => setNewRating(Number(e.target.value))}
-              className="p-2 rounded border bg-gray-200 text-gray-700 shadow-sm w-full"
+              className="p-2 w-full rounded border bg-white shadow-sm"
             >
               {[5, 4, 3, 2, 1].map((r) => (
                 <option key={r} value={r}>
@@ -235,47 +234,51 @@ const ProductDetails = () => {
             <textarea
               value={newComment}
               onChange={(e) => setNewComment(e.target.value)}
-              className="p-2 rounded border bg-gray-200 text-gray-700 shadow-sm w-full"
-              rows="3"
+              rows="4"
+              className="p-2 w-full rounded border bg-white shadow-sm"
               placeholder="Share your experience..."
             />
           </div>
 
           <button
             type="submit"
-            className="px-6 py-2 bg-green-600 text-white rounded-lg shadow-md hover:bg-green-700 transition"
+            className="px-6 py-2 bg-green-600 text-white font-semibold rounded hover:bg-green-700 transition"
           >
             Submit Review
           </button>
         </form>
-      </div>
+      </section>
 
       {/* Related Products */}
-      <div className="mt-8 border-t pt-4">
-        <h2 className="text-2xl font-semibold mb-4">Related Products</h2>
-        <div className="grid grid-cols-1 sm:grid-cols-2 md:grid-cols-3 gap-6">
+      <section className="mt-12">
+        <h2 className="text-2xl font-bold mb-4">Related Products</h2>
+        <div className="grid grid-cols-2 sm:grid-cols-3 md:grid-cols-4 gap-6">
           {relatedProducts.map((relatedProduct) => (
             <div
               key={relatedProduct._id}
-              className="bg-gray-100 p-4 rounded-lg shadow-md transition hover:shadow-lg"
+              className="bg-white border rounded-lg shadow hover:shadow-lg transition"
             >
               <img
                 src={relatedProduct.image}
                 alt={relatedProduct.name}
-                className="h-40 w-full object-cover mb-4 rounded-lg"
+                className="h-40 w-full object-cover rounded-t-lg"
               />
-              <h3 className="text-lg font-semibold text-gray-800">{relatedProduct.name}</h3>
-              <p className="text-green-500 font-bold">₱{relatedProduct.price}</p>
-              <button
-                onClick={() => navigate(`/products/${relatedProduct._id}`)}
-                className="mt-4 px-5 py-2 bg-blue-600 text-white rounded-lg shadow-md hover:bg-blue-700 transition"
-              >
-                View Details
-              </button>
+              <div className="p-4">
+                <h3 className="text-sm font-semibold text-gray-800 truncate">
+                  {relatedProduct.name}
+                </h3>
+                <p className="text-red-500 font-bold text-lg mt-1">₱{relatedProduct.price}</p>
+                <button
+                  onClick={() => navigate(`/products/${relatedProduct._id}`)}
+                  className="mt-3 w-full px-4 py-2 bg-orange-500 text-white rounded hover:bg-orange-600 transition"
+                >
+                  View Details
+                </button>
+              </div>
             </div>
           ))}
         </div>
-      </div>
+      </section>
     </div>
   );
 };
