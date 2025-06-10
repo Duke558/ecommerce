@@ -22,7 +22,7 @@ const Products = () => {
       if (searchQuery) query.search = searchQuery;
 
       const queryString = new URLSearchParams(query).toString();
-      const res = await axios.get(`http://localhost:5000/api/products?${queryString}`);
+      const res = await axios.get(`https://ecommerce-ams5.onrender.com/api/products?${queryString}`);
       setProducts(res.data);
     } catch (err) {
       console.error('Error fetching products:', err);

@@ -11,7 +11,7 @@ const TrackOrder = () => {
   useEffect(() => {
     const fetchOrder = async () => {
       try {
-        const response = await axios.get(`http://localhost:5000/api/orders/${orderId}`);
+        const response = await axios.get(`https://ecommerce-ams5.onrender.com/api/orders/${orderId}`);
         setOrder(response.data);
         setLoading(false);
       } catch (err) {

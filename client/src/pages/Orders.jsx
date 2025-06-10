@@ -12,7 +12,7 @@ const Orders = () => {
 
     const fetchOrders = async () => {
       try {
-        const response = await axios.get('http://localhost:5000/api/orders', {
+        const response = await axios.get('https://ecommerce-ams5.onrender.com/api/orders', {
           params: {
             userId: user.id,
             email: user.emailAddresses[0]?.emailAddress,

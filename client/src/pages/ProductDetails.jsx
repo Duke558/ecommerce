@@ -112,7 +112,7 @@ const ProductDetails = () => {
 
     try {
       await axios.post(
-        `http://localhost:5000/api/reviews/product/${product._id}`,
+        `https://ecommerce-ams5.onrender.com/api/reviews/product/${product._id}`,
         { rating: newRating, comment: newComment },
         { headers: { Authorization: `Bearer ${token}` } }
       );

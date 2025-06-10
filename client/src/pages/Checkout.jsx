@@ -49,7 +49,7 @@ const Checkout = () => {
     }
     setIsApplyingDiscount(true);
     try {
-      const { data } = await axios.post('http://localhost:5000/api/apply-promo', {
+      const { data } = await axios.post('https://ecommerce-ams5.onrender.com/api/apply-promo', {
         promoCode: discountCode.trim(),
         totalAmount: subtotal,
       });
