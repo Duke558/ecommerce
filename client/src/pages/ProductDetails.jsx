@@ -73,7 +73,7 @@ const ProductDetails = () => {
 
   const fetchRelatedProducts = async (categoryId) => {
     try {
-      const res = await axios.get(`http://localhost:5000/api/products?category=${categoryId}`);
+      const res = await axios.get(`https://ecommerce-ams5.onrender.com/api/products?category=${categoryId}`);
       setRelatedProducts(res.data);
     } catch (err) {
       console.error('Error fetching related products:', err);
