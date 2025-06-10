@@ -129,7 +129,7 @@ const Checkout = () => {
 
     try {
       setIsSubmitting(true);
-      const response = await axios.post('http://localhost:5000/api/orders', order);
+      const response = await axios.post('https://ecommerce-ams5.onrender.com/api/orders', order);
       if (response.status === 201) {
         const { orderId } = response.data;
         clearCart();
