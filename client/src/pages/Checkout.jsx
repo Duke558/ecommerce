@@ -149,166 +149,169 @@ const Checkout = () => {
   return (
     <div className="max-w-2xl mx-auto p-6 bg-white shadow-lg rounded-md border border-gray-200">
       <h2 className="text-3xl font-semibold mb-6 text-gray-800">Checkout</h2>
+
       {cartItems.length === 0 ? (
         <p className="text-gray-600 text-lg text-center">Your cart is empty. Please add items to proceed.</p>
       ) : (
-        cartItems.map((item, index) => (
-          <div key={item.id || index} className="flex justify-between items-center bg-gray-50 p-3 rounded-md mb-2 shadow-sm">
-            <p className="text-gray-700 font-medium">
-              {item.name} x {item.quantity} = ₱{(item.price * item.quantity).toFixed(2)}
-            </p>
-          </div>
-        ))
-      )}
-
-      {/* Discount */}
-      <div className="mt-6">
-        <label className="block font-medium text-gray-700 mb-2">Discount Code</label>
-        <div className="flex">
-          <input
-            type="text"
-            placeholder="Enter code (e.g. SAVE20)"
-            className="flex-1 border border-gray-300 p-2 rounded-l-md focus:ring-2 focus:ring-blue-500"
-            value={discountCode}
-            onChange={(e) => setDiscountCode(e.target.value)}
-            disabled={isApplyingDiscount}
-          />
-          <button
-            onClick={handleDiscountApply}
-            disabled={isApplyingDiscount}
-            className={`px-4 py-2 rounded-r-md text-white transition ${
-              isApplyingDiscount ? 'bg-gray-400 cursor-not-allowed' : 'bg-blue-600 hover:bg-blue-700'
-            }`}
-          >
-            {isApplyingDiscount ? 'Applying...' : 'Apply'}
-          </button>
-        </div>
-      </div>
-
-      {/* Delivery Method */}
-      <div className="mt-6">
-        <label className="block font-medium text-gray-700">Delivery Method</label>
-        <select
-          value={deliveryMethod}
-          onChange={(e) => setDeliveryMethod(e.target.value)}
-          className="border p-2 rounded w-full focus:ring-2 focus:ring-blue-500"
-          disabled={isSubmitting}
-        >
-          <option value="pickup">Pickup (₱0)</option>
-          <option value="delivery">Delivery (₱50)</option>
-        </select>
-      </div>
-
-      {/* Shipping Address */}
-      {deliveryMethod === 'delivery' && (
-        <div className="border p-4 rounded mb-4 bg-gray-50">
-          <h3 className="text-lg font-medium mb-3">Shipping Address</h3>
-          {Object.entries(shippingAddress).map(([key, value]) => (
-            <input
-              key={key}
-              type="text"
-              placeholder={key.replace(/([A-Z])/g, ' $1')}
-              className="border p-2 rounded w-full mb-2"
-              value={value}
-              onChange={(e) => setShippingAddress({ ...shippingAddress, [key]: e.target.value })}
-              disabled={isSubmitting}
-            />
+        <>
+          {cartItems.map((item, index) => (
+            <div key={item.id || index} className="flex justify-between items-center bg-gray-50 p-3 rounded-md mb-2 shadow-sm">
+              <p className="text-gray-700 font-medium">
+                {item.name} x {item.quantity} = ₱{(item.price * item.quantity).toFixed(2)}
+              </p>
+            </div>
           ))}
-        </div>
+
+          {/* Discount */}
+          <div className="mt-6">
+            <label className="block font-medium text-gray-700 mb-2">Discount Code</label>
+            <div className="flex">
+              <input
+                type="text"
+                placeholder="Enter code (e.g. SAVE20)"
+                className="flex-1 border border-gray-300 p-2 rounded-l-md focus:ring-2 focus:ring-blue-500"
+                value={discountCode}
+                onChange={(e) => setDiscountCode(e.target.value)}
+                disabled={isApplyingDiscount}
+              />
+              <button
+                onClick={handleDiscountApply}
+                disabled={isApplyingDiscount}
+                className={`px-4 py-2 rounded-r-md text-white transition ${
+                  isApplyingDiscount ? 'bg-gray-400 cursor-not-allowed' : 'bg-blue-600 hover:bg-blue-700'
+                }`}
+              >
+                {isApplyingDiscount ? 'Applying...' : 'Apply'}
+              </button>
+            </div>
+          </div>
+
+          {/* Delivery Method */}
+          <div className="mt-6">
+            <label className="block font-medium text-gray-700">Delivery Method</label>
+            <select
+              value={deliveryMethod}
+              onChange={(e) => setDeliveryMethod(e.target.value)}
+              className="border p-2 rounded w-full focus:ring-2 focus:ring-blue-500"
+              disabled={isSubmitting}
+            >
+              <option value="pickup">Pickup (₱0)</option>
+              <option value="delivery">Delivery (₱50)</option>
+            </select>
+          </div>
+
+          {/* Shipping Address */}
+          {deliveryMethod === 'delivery' && (
+            <div className="border p-4 rounded mb-4 mt-4 bg-gray-50">
+              <h3 className="text-lg font-medium mb-3">Shipping Address</h3>
+              {Object.entries(shippingAddress).map(([key, value]) => (
+                <input
+                  key={key}
+                  type="text"
+                  placeholder={key.replace(/([A-Z])/g, ' $1')}
+                  className="border p-2 rounded w-full mb-2"
+                  value={value}
+                  onChange={(e) => setShippingAddress({ ...shippingAddress, [key]: e.target.value })}
+                  disabled={isSubmitting}
+                />
+              ))}
+            </div>
+          )}
+
+          {/* Payment Method */}
+          <div className="mt-6">
+            <label className="block font-medium text-gray-700">Payment Method</label>
+            <select
+              value={paymentMethod}
+              onChange={(e) => setPaymentMethod(e.target.value)}
+              className="border p-2 rounded w-full focus:ring-2 focus:ring-blue-500"
+              disabled={isSubmitting}
+            >
+              <option value="cod">Cash on Delivery</option>
+              <option value="gcash">GCash</option>
+              <option value="credit_card">Credit Card</option>
+            </select>
+          </div>
+
+          {/* GCash Fields */}
+          {paymentMethod === 'gcash' && (
+            <div className="border p-4 rounded mt-4 bg-gray-50">
+              <input
+                type="text"
+                placeholder="GCash Number"
+                className="border p-2 rounded w-full mb-2"
+                value={gcashNumber}
+                onChange={(e) => setGcashNumber(e.target.value)}
+                disabled={isSubmitting}
+              />
+              <input
+                type="password"
+                placeholder="GCash PIN"
+                className="border p-2 rounded w-full"
+                value={gcashPin}
+                onChange={(e) => setGcashPin(e.target.value)}
+                disabled={isSubmitting}
+              />
+            </div>
+          )}
+
+          {/* Credit Card Fields */}
+          {paymentMethod === 'credit_card' && (
+            <div className="border p-4 rounded mt-4 bg-gray-50">
+              <input
+                type="text"
+                placeholder="Card Number"
+                className="border p-2 rounded w-full mb-2"
+                value={cardNumber}
+                onChange={(e) => setCardNumber(e.target.value)}
+                disabled={isSubmitting}
+              />
+              <input
+                type="text"
+                placeholder="Expiry Date (MM/YY)"
+                className="border p-2 rounded w-full mb-2"
+                value={expiryDate}
+                onChange={(e) => setExpiryDate(e.target.value)}
+                disabled={isSubmitting}
+              />
+              <input
+                type="text"
+                placeholder="CVV"
+                className="border p-2 rounded w-full mb-2"
+                value={cvv}
+                onChange={(e) => setCvv(e.target.value)}
+                disabled={isSubmitting}
+              />
+              <input
+                type="text"
+                placeholder="Cardholder Name"
+                className="border p-2 rounded w-full"
+                value={cardholderName}
+                onChange={(e) => setCardholderName(e.target.value)}
+                disabled={isSubmitting}
+              />
+            </div>
+          )}
+
+          {/* Order Summary */}
+          <div className="mt-6 border-t pt-4">
+            <p className="text-lg text-gray-700">Subtotal: ₱{subtotal.toFixed(2)}</p>
+            <p className="text-lg text-gray-700">Discount: -₱{discountAmount.toFixed(2)}</p>
+            <p className="text-lg text-gray-700">Delivery Fee: ₱{deliveryFee.toFixed(2)}</p>
+            <p className="text-xl font-semibold mt-2 text-gray-800">Total: ₱{totalAmount.toFixed(2)}</p>
+          </div>
+
+          <button
+            onClick={handleOrderSubmit}
+            disabled={isSubmitting}
+            className={`mt-6 w-full py-3 text-white font-semibold rounded-md transition ${
+              isSubmitting ? 'bg-gray-400 cursor-not-allowed' : 'bg-orange-600 hover:bg-orange-700'
+            }`}
+            >
+            {isSubmitting ? 'Placing Order...' : 'Place Order'}
+          </button>
+        </>
       )}
-
-      {/* Payment Method */}
-      <div className="mt-6">
-        <label className="block font-medium text-gray-700">Payment Method</label>
-        <select
-          value={paymentMethod}
-          onChange={(e) => setPaymentMethod(e.target.value)}
-          className="border p-2 rounded w-full focus:ring-2 focus:ring-blue-500"
-          disabled={isSubmitting}
-        >
-          <option value="cod">Cash on Delivery</option>
-          <option value="gcash">GCash</option>
-          <option value="credit_card">Credit Card</option>
-        </select>
-      </div>
-
-      {/* GCash Fields */}
-      {paymentMethod === 'gcash' && (
-        <div className="border p-4 rounded mt-4 bg-gray-50">
-          <input
-            type="text"
-            placeholder="GCash Number"
-            className="border p-2 rounded w-full mb-2"
-            value={gcashNumber}
-            onChange={(e) => setGcashNumber(e.target.value)}
-            disabled={isSubmitting}
-          />
-          <input
-            type="password"
-            placeholder="GCash PIN"
-            className="border p-2 rounded w-full"
-            value={gcashPin}
-            onChange={(e) => setGcashPin(e.target.value)}
-            disabled={isSubmitting}
-          />
-        </div>
-      )}
-
-      {/* Credit Card Fields */}
-      {paymentMethod === 'credit_card' && (
-        <div className="border p-4 rounded mt-4 bg-gray-50">
-          <input
-            type="text"
-            placeholder="Card Number"
-            className="border p-2 rounded w-full mb-2"
-            value={cardNumber}
-            onChange={(e) => setCardNumber(e.target.value)}
-            disabled={isSubmitting}
-          />
-          <input
-            type="text"
-            placeholder="Expiry Date (MM/YY)"
-            className="border p-2 rounded w-full mb-2"
-            value={expiryDate}
-            onChange={(e) => setExpiryDate(e.target.value)}
-            disabled={isSubmitting}
-          />
-          <input
-            type="text"
-            placeholder="CVV"
-            className="border p-2 rounded w-full mb-2"
-            value={cvv}
-            onChange={(e) => setCvv(e.target.value)}
-            disabled={isSubmitting}
-          />
-          <input
-            type="text"
-            placeholder="Cardholder Name"
-            className="border p-2 rounded w-full"
-            value={cardholderName}
-            onChange={(e) => setCardholderName(e.target.value)}
-            disabled={isSubmitting}
-          />
-        </div>
-      )}
-
-      {/* Summary & Button */}
-      <div className="mt-6 text-gray-800">
-        <p>Subtotal: ₱{subtotal.toFixed(2)}</p>
-        <p>Discount: -₱{discountAmount.toFixed(2)}</p>
-        <p>Delivery Fee: ₱{deliveryFee.toFixed(2)}</p>
-        <p className="font-bold text-xl mt-2">Total: ₱{totalAmount.toFixed(2)}</p>
-      </div>
-
-      <button
-        onClick={handleOrderSubmit}
-        disabled={isSubmitting || cartItems.length === 0}
-        className={`mt-6 w-full py-3 rounded-md text-white font-semibold transition ${
-          isSubmitting ? 'bg-gray-400 cursor-not-allowed' : 'bg-green-600 hover:bg-green-700'
-        }`}
-      >
-        {isSubmitting ? 'Placing Order...' : 'Place Order'}
-      </button>
     </div>
   );
 };

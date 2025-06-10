@@ -1,26 +1,31 @@
-import React from 'react';
 import { Link } from 'react-router-dom';
 
 const ProductCard = ({ product }) => {
   return (
-    <div className="bg-white rounded-xl shadow-sm border border-gray-200 overflow-hidden hover:shadow-lg transition-all">
+    <div className="bg-white dark:bg-gray-800 rounded-2xl border border-gray-200 dark:border-gray-700 shadow-md hover:shadow-xl transition-all duration-300 overflow-hidden">
+      {/* Product Image */}
       <img
         src={product.image}
         alt={product.name}
-        className="w-full h-48 sm:h-56 object-cover"
+        className="w-full h-44 sm:h-56 md:h-64 object-cover object-center"
       />
 
+      {/* Product Info */}
       <div className="p-4 sm:p-5">
-        <h2 className="text-base sm:text-lg font-semibold text-gray-800 line-clamp-2">
+        {/* Product Name */}
+        <h2 className="text-sm sm:text-base md:text-lg font-semibold text-gray-900 dark:text-white line-clamp-2">
           {product.name}
         </h2>
-        <p className="text-green-600 font-bold text-sm sm:text-base mt-1">
-          ₱{product.price}
+
+        {/* Price */}
+        <p className="text-red-500 font-bold text-sm sm:text-base mt-1">
+          ₱{product.price.toLocaleString()}
         </p>
 
+        {/* View Details Button */}
         <Link
           to={`/products/${product._id}`}
-          className="inline-block mt-3 w-full sm:w-auto text-center bg-blue-600 text-white px-4 py-2 rounded-lg text-sm sm:text-base hover:bg-blue-700 transition"
+          className="block mt-4 w-full text-center bg-orange-500 hover:bg-orange-600 text-white font-medium py-2 rounded-xl text-sm sm:text-base transition duration-300"
         >
           View Details
         </Link>

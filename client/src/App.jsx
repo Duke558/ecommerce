@@ -51,7 +51,7 @@ const App = () => {
       {/* 🔹 Navbar */}
       <header className="bg-white shadow fixed top-0 left-0 w-full z-50">
         <div className="max-w-6xl mx-auto px-4 py-3 flex flex-wrap items-center justify-between">
-          <h1 className="text-xl sm:text-2xl font-bold text-orange-500">🛒 SnapCartel</h1>
+          <h1 className="text-xl sm:text-2xl font-bold text-orange-500">SnapCartel</h1>
 
           {/* 🔹 Main Navigation */}
           <nav className="flex flex-wrap justify-center sm:justify-start gap-4 text-gray-600 font-medium text-sm">

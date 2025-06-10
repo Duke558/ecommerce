@@ -135,24 +135,22 @@ const ProductDetails = () => {
   if (error || !product) return <p className="text-center p-10 text-red-500">Product not found.</p>;
 
   return (
-    <div className="max-w-7xl mx-auto px-4 py-8">
+    <div className="max-w-screen-xl mx-auto px-4 sm:px-6 lg:px-8 py-8">
       {/* Product Section */}
-      <div className="grid grid-cols-1 md:grid-cols-2 gap-8">
-        {/* Product Image */}
+      <div className="grid grid-cols-1 lg:grid-cols-2 gap-10">
         <div>
           <img
             src={product.image}
             alt={product.name}
-            className="w-full h-96 object-cover rounded-lg shadow-md"
+            className="w-full h-80 sm:h-96 object-cover rounded-lg shadow-md"
           />
         </div>
 
-        {/* Product Info */}
-        <div className="flex flex-col justify-between">
+        <div className="flex flex-col justify-between space-y-4">
           <div>
-            <h2 className="text-3xl font-bold text-gray-900 mb-2">{product.name}</h2>
-            <p className="text-gray-600 mb-4">{product.description}</p>
-            <p className="text-red-500 text-3xl font-extrabold mb-2">₱{product.price}</p>
+            <h2 className="text-2xl sm:text-3xl font-bold text-gray-900 mb-2">{product.name}</h2>
+            <p className="text-gray-600 mb-4 text-sm sm:text-base">{product.description}</p>
+            <p className="text-red-500 text-2xl sm:text-3xl font-extrabold mb-2">₱{product.price}</p>
             {averageRating && (
               <p className="text-yellow-500 font-medium mb-4">⭐ {averageRating} / 5</p>
             )}
@@ -160,16 +158,16 @@ const ProductDetails = () => {
 
           <button
             onClick={handleAddToCart}
-            className="w-full md:w-auto px-6 py-3 bg-orange-500 text-white text-lg font-semibold rounded-lg hover:bg-orange-600 transition"
+            className="w-full sm:w-auto px-6 py-3 bg-orange-500 text-white text-lg font-semibold rounded-lg hover:bg-orange-600 transition"
           >
             🛒 Add to Cart
           </button>
         </div>
       </div>
 
-      {/* Customer Reviews Section */}
+      {/* Reviews */}
       <section className="mt-12">
-        <h2 className="text-2xl font-bold mb-4">Customer Reviews</h2>
+        <h2 className="text-xl sm:text-2xl font-bold mb-4">Customer Reviews</h2>
 
         {!showReviews ? (
           <button
@@ -180,11 +178,11 @@ const ProductDetails = () => {
           </button>
         ) : (
           <>
-            <div className="flex flex-wrap gap-4 items-center mb-4">
+            <div className="flex flex-col sm:flex-row sm:items-center sm:gap-4 mb-4">
               <select
                 value={sortBy}
                 onChange={handleSortChange}
-                className="p-2 rounded border bg-white shadow-sm"
+                className="p-2 rounded border bg-white shadow-sm mb-2 sm:mb-0"
               >
                 <option value="createdAt">Sort by Date</option>
                 <option value="rating">Sort by Rating</option>
@@ -199,7 +197,7 @@ const ProductDetails = () => {
 
               <button
                 onClick={() => setShowReviews(false)}
-                className="ml-auto px-4 py-2 bg-red-600 text-white rounded hover:bg-red-700"
+                className="mt-2 sm:mt-0 sm:ml-auto px-4 py-2 bg-red-600 text-white rounded hover:bg-red-700"
               >
                 Hide Reviews
               </button>
@@ -210,9 +208,9 @@ const ProductDetails = () => {
         )}
       </section>
 
-      {/* Submit Review Section */}
+      {/* Submit Review */}
       <section className="mt-10">
-        <h3 className="text-xl font-bold mb-3">Write a Review</h3>
+        <h3 className="text-lg sm:text-xl font-bold mb-3">Write a Review</h3>
         <form onSubmit={handleSubmitReview} className="space-y-4">
           <div>
             <label className="block mb-1">Rating</label>
@@ -251,8 +249,8 @@ const ProductDetails = () => {
 
       {/* Related Products */}
       <section className="mt-12">
-        <h2 className="text-2xl font-bold mb-4">Related Products</h2>
-        <div className="grid grid-cols-2 sm:grid-cols-3 md:grid-cols-4 gap-6">
+        <h2 className="text-xl sm:text-2xl font-bold mb-4">Related Products</h2>
+        <div className="grid grid-cols-2 sm:grid-cols-3 lg:grid-cols-4 gap-6">
           {relatedProducts.map((relatedProduct) => (
             <div
               key={relatedProduct._id}
