@@ -56,7 +56,7 @@ const ProductDetails = () => {
   const fetchReviews = async (productId) => {
     try {
       const res = await axios.get(
-        `http://localhost:5000/api/reviews/product/${productId}?sortBy=${sortBy}&sortOrder=${sortOrder}`
+        `https://ecommerce-ams5.onrender.com/api/reviews/product/${productId}?sortBy=${sortBy}&sortOrder=${sortOrder}`
       );
       setReviews(res.data);
     } catch (err) {
