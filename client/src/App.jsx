@@ -76,7 +76,7 @@ const App = () => {
           <div className="flex gap-2 items-center text-gray-600 text-sm">
             <SignedIn>
               <Link to="/orders" className="hover:text-orange-500">
-                📦 My Orders
+                 My Orders
               </Link>
               <UserButton afterSignOutUrl="/" />
             </SignedIn>
