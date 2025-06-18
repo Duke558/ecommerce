@@ -12,19 +12,37 @@ const Cart = () => {
   const [cartItems, setCartItems] = useState([]);
   const navigate = useNavigate();
 
+  const refreshCart = () => {
+    const items = getCart();
+
+    // Ensure each item has a unique cartItemId
+    const patchedItems = items.map((item) => {
+      if (!item.cartItemId) {
+        return {
+          ...item,
+          cartItemId: crypto.randomUUID?.() || `${item.name}-${Date.now()}`,
+        };
+      }
+      return item;
+    });
+
+    localStorage.setItem("cart", JSON.stringify(patchedItems));
+    setCartItems(patchedItems);
+  };
+
   useEffect(() => {
-    setCartItems(getCart());
+    refreshCart();
   }, []);
 
   const handleRemove = (cartItemId) => {
     removeFromCart(cartItemId);
-    setCartItems(getCart());
+    refreshCart();
   };
 
   const handleQuantityChange = (cartItemId, quantity) => {
     if (quantity < 1) return;
-    updateQuantity(cartItemId, parseInt(quantity));
-    setCartItems(getCart());
+    updateQuantity(cartItemId, quantity);
+    refreshCart();
   };
 
   const total = getCartTotal();
@@ -37,7 +55,6 @@ const Cart = () => {
       animate={{ opacity: 1 }}
       transition={{ duration: 0.5 }}
     >
-      {/* 🔸 Header */}
       <motion.h2
         className="text-2xl sm:text-3xl font-bold text-orange-500 text-center mb-6"
         initial={{ y: -20, opacity: 0 }}
@@ -48,7 +65,6 @@ const Cart = () => {
       </motion.h2>
 
       <div className="flex flex-col lg:flex-row gap-6">
-        {/* 🔸 Cart Items */}
         <div className="flex-1 bg-white rounded-xl shadow-md p-4 sm:p-6">
           {cartItems.length === 0 ? (
             <p className="text-center text-gray-500 text-lg">
@@ -58,7 +74,7 @@ const Cart = () => {
             <div className="space-y-4">
               {cartItems.map((item, index) => (
                 <motion.div
-                  key={item.cartItemId || item._id || item.id}
+                  key={item.cartItemId}
                   className="flex flex-col sm:flex-row justify-between items-center gap-4 border-b pb-4"
                   initial={{ opacity: 0, y: 10 }}
                   animate={{ opacity: 1, y: 0 }}
@@ -74,7 +90,9 @@ const Cart = () => {
                       <h3 className="font-semibold text-gray-800">
                         {item.name}
                       </h3>
-                      <p className="text-orange-500 font-medium">₱{item.price}</p>
+                      <p className="text-orange-500 font-medium">
+                        ₱{item.price}
+                      </p>
                     </div>
                   </div>
 
@@ -111,7 +129,6 @@ const Cart = () => {
           )}
         </div>
 
-        {/* 🔸 Cart Summary */}
         <motion.div
           className="bg-white rounded-xl shadow-md p-4 sm:p-6 w-full lg:w-1/3"
           initial={{ x: 30, opacity: 0 }}

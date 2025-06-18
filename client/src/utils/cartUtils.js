@@ -1,38 +1,36 @@
-// utils/cartUtils.js
-
-// Get the cart from localStorage
+// Get cart from localStorage
 export const getCart = () => {
   try {
-    const data = localStorage.getItem('cart');
+    const data = localStorage.getItem("cart");
     return data ? JSON.parse(data) : [];
   } catch (e) {
-    console.warn('Failed to access localStorage:', e);
+    console.warn("Failed to access localStorage:", e);
     return [];
   }
 };
 
-// Add a product to the cart (each entry is treated as unique)
+// Add product to the cart with unique cartItemId
 export const addToCart = (product) => {
   const cart = getCart();
 
   const newCartItem = {
     ...product,
-    cartItemId: crypto.randomUUID(), // Unique per cart entry
+    cartItemId: generateUniqueCartItemId(product), // ✅ Always stable & unique
     quantity: 1,
   };
 
   cart.push(newCartItem);
-  localStorage.setItem('cart', JSON.stringify(cart));
+  localStorage.setItem("cart", JSON.stringify(cart));
 };
 
-// Remove a product from the cart by cartItemId
+// Remove item by unique cartItemId
 export const removeFromCart = (cartItemId) => {
   const cart = getCart();
   const updatedCart = cart.filter((item) => item.cartItemId !== cartItemId);
-  localStorage.setItem('cart', JSON.stringify(updatedCart));
+  localStorage.setItem("cart", JSON.stringify(updatedCart));
 };
 
-// Update the quantity of a cart item by cartItemId
+// Update quantity by cartItemId
 export const updateQuantity = (cartItemId, quantity) => {
   const validQty = Math.max(1, parseInt(quantity) || 1);
   const cart = getCart();
@@ -41,16 +39,31 @@ export const updateQuantity = (cartItemId, quantity) => {
     item.cartItemId === cartItemId ? { ...item, quantity: validQty } : item
   );
 
-  localStorage.setItem('cart', JSON.stringify(updatedCart));
+  localStorage.setItem("cart", JSON.stringify(updatedCart));
 };
 
-// Clear the cart entirely
-export const clearCart = () => {
-  localStorage.removeItem('cart');
-};
-
-// Calculate total cart value
+// Calculate total
 export const getCartTotal = () => {
   const cart = getCart();
   return cart.reduce((sum, item) => sum + item.price * item.quantity, 0);
+};
+
+// Clear cart
+export const clearCart = () => {
+  localStorage.removeItem("cart");
+};
+
+// Generate a stable, unique cartItemId based on product details
+const generateUniqueCartItemId = (product) => {
+  if (crypto?.randomUUID) return crypto.randomUUID();
+  return `${product.id || product.name}-${generateUUID()}`; // fallback
+};
+
+// Fallback UUID generator (when crypto is unavailable)
+const generateUUID = () => {
+  return "xxxxxxxx-xxxx-4xxx-yxxx-xxxxxxxxxxxx".replace(/[xy]/g, (c) => {
+    const r = (Math.random() * 16) | 0;
+    const v = c === "x" ? r : (r & 0x3) | 0x8;
+    return v.toString(16);
+  });
 };
